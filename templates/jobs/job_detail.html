@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h1 class="card-title">{{ job.title }}</h1>
+                            <h4 class="card-subtitle mb-3 text-muted">{{ job.company.employerprofile.company_name }}</h4>
+                        </div>
+                        {% if job.company.employerprofile.company_logo %}
+                        <img src="{{ job.company.employerprofile.company_logo.url }}" alt="{{ job.company.employerprofile.company_name }}" class="rounded-circle" width="80" height="80">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <span class="badge bg-primary">{{ job.get_job_type_display }}</span>
+                        <span class="badge bg-secondary ms-2">{{ job.location }}</span>
+                        {% if job.salary %}
+                        <span class="badge bg-success ms-2">{{ job.salary }}</span>
+                        {% endif %}
+                        <span class="badge bg-info ms-2">{{ job.category }}</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Job Description</h5>
+                        <p>{{ job.description|linebreaks }}</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Requirements</h5>
+                        <ul>
+                            <li>Experience in relevant field</li>
+                            <li>Strong communication skills</li>
+                            <li>Ability to work in a team</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>About the Company</h5>
+                        <p>{{ job.company.employerprofile.company_description }}</p>
+                        {% if job.company.employerprofile.website %}
+                        <p><strong>Website:</strong> <a href="{{ job.company.employerprofile.website }}" target="_blank">{{ job.company.employerprofile.website }}</a></p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Posted {{ job.posted_on|timesince }} ago • Apply before {{ job.deadline|date:"F d, Y" }}</small>
+                        {% if user.is_authenticated %}
+                            {% if user.is_job_seeker %}
+                                {% if has_applied %}
+                                <button class="btn btn-success" disabled>Already Applied</button>
+                                {% else %}
+                                <a href="{% url 'apply_job' job.id %}" class="btn btn-primary">Apply Now</a>
+                                {% endif %}
+                            {% elif user == job.company %}
+                            <a href="{% url 'manage_jobs' %}" class="btn btn-outline-secondary">Manage Job</a>
+                            {% endif %}
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'job_detail' job.id %}" class="btn btn-primary">Login to Apply</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5>Job Summary</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-briefcase me-2"></i> Job Type</span>
+                            <span>{{ job.get_job_type_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-geo-alt me-2"></i> Location</span>
+                            <span>{{ job.location }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-cash-coin me-2"></i> Salary</span>
+                            <span>{{ job.salary|default:"Not specified" }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="bi bi-calendar me-2"></i> Deadline</span>
+                            <span>{{ job.deadline|date:"F d, Y" }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Similar Jobs</h5>
+                </div>
+                <div class="card-body">
+                    {% for similar_job in similar_jobs %}
+                    <div class="mb-3">
+                        <h6><a href="{% url 'job_detail' similar_job.id %}">{{ similar_job.title }}</a></h6>
+                        <small class="text-muted">{{ similar_job.company.employerprofile.company_name }}</small>
+                        <div class="mt-1">
+                            <span class="badge bg-secondary">{{ similar_job.location }}</span>
+                            {% if similar_job.salary %}
+                            <span class="badge bg-success ms-1">{{ similar_job.salary }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if not forloop.last %}<hr>{% endif %}
+                    {% empty %}
+                    <p>No similar jobs found.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

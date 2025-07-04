@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="container">
+    <h2>Applications for Your Jobs</h2>
+    <ul>
+      {% for application in applications %}
+        <li>
+          {{ application.applicant.username }} applied for {{ application.job.title }} - Status: {{ application.status }}
+          <br>
+          <strong>Cover Letter:</strong> {{ application.cover_letter }}
+          <br>
+          <a href="{% url 'update_application_status' application.id 'reviewed' %}">Mark as Reviewed</a> |
+          <a href="{% url 'update_application_status' application.id 'interview' %}">Interview</a> |
+          <a href="{% url 'update_application_status' application.id 'rejected' %}">Reject</a> |
+          <a href="{% url 'update_application_status' application.id 'hired' %}">Hire</a>
+        </li>
+        <hr>
+      {% empty %}
+        <li>No applications yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

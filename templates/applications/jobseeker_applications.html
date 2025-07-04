@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="container">
+    <h2>My Applications</h2>
+    <ul>
+      {% for application in applications %}
+        <li>
+          {{ application.job.title }} - Status: {{ application.status }}
+          <br>
+          <strong>Cover Letter:</strong> {{ application.cover_letter }}
+        </li>
+        <hr>
+      {% empty %}
+        <li>You have not applied to any jobs yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

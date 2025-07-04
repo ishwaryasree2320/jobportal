@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Employer Profile{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Welcome, {{ user.username }}</h2>
+    <hr>
+    <h4>Company Information</h4>
+    <p><strong>Company Name:</strong> {{ profile.company_name }}</p>
+    <p><strong>Description:</strong> {{ profile.company_description }}</p>
+    <p><strong>Website:</strong> 
+        {% if profile.website %}
+            <a href="{{ profile.website }}" target="_blank">{{ profile.website }}</a>
+        {% else %}
+            Not provided
+        {% endif %}
+    </p>
+    <p><strong>Logo:</strong><br>
+        {% if profile.company_logo %}
+            <img src="{{ profile.company_logo.url }}" alt="Company Logo" width="120" height="120">
+        {% else %}
+            No logo uploaded
+        {% endif %}
+    </p>
+</div>
+{% endblock %}

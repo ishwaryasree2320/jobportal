@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage My Jobs{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>My Posted Jobs</h2>
+
+    {% if jobs %}
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Posted On</th>
+                    <th>Status</th>
+                    <th>Deadline</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></td>
+                    <td>{{ job.posted_on|date:"M d, Y" }}</td>
+                    <td>
+                        {% if job.is_active %}
+                        <span class="badge bg-success">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger">Closed</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ job.deadline|date:"M d, Y" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You haven't posted any jobs yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Job Seeker Profile{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2>Welcome, {{ user.username }}</h2>
+    <hr>
+    <h4>Profile Information</h4>
+    <p><strong>Full Name:</strong> {{ profile.full_name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Resume:</strong> 
+        {% if profile.resume %}
+            <a href="{{ profile.resume.url }}" target="_blank">View Resume</a>
+        {% else %}
+            Resume not uploaded
+        {% endif %}
+    </p>
+</div>
+{% endblock %}

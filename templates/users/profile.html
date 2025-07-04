@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">My Profile</h2>
+
+    {% if user.is_employer %}
+        <h4>Employer Details</h4>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Company Name:</strong> {{ user.employerprofile.company_name }}</p>
+        <p><strong>Website:</strong> 
+            {% if user.employerprofile.website %}
+                <a href="{{ user.employerprofile.website }}" target="_blank">{{ user.employerprofile.website }}</a>
+            {% else %}
+                Not provided
+            {% endif %}
+        </p>
+        <p><strong>Company Description:</strong> {{ user.employerprofile.company_description }}</p>
+        {% if user.employerprofile.company_logo %}
+        <p><strong>Logo:</strong><br>
+            <img src="{{ user.employerprofile.company_logo.url }}" alt="Logo" width="120" height="120">
+        </p>
+        {% endif %}
+    
+    {% elif user.is_job_seeker %}
+        <h4>Job Seeker Details</h4>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>Full Name:</strong> {{ user.jobseekerprofile.full_name }}</p>
+        <p><strong>Resume:</strong> 
+            {% if user.jobseekerprofile.resume %}
+                <a href="{{ user.jobseekerprofile.resume.url }}" target="_blank">View Resume</a>
+            {% else %}
+                Not uploaded
+            {% endif %}
+        </p>
+    {% else %}
+        <p>Your profile role is not recognized.</p>
+    {% endif %}
+</div>
+{% endblock %}

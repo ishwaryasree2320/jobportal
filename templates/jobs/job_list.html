@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Listings{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4">Find Your Dream Job</h1>
+    
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control" placeholder="Search jobs..." value="{{ request.GET.q }}">
+        </div>
+        <div class="col-md-3">
+            <input type="text" name="location" class="form-control" placeholder="Location" value="{{ request.GET.location }}">
+        </div>
+        <div class="col-md-3">
+            <select name="category" class="form-select">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if request.GET.category == cat.id|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    {% if jobs %}
+        {% for job in jobs %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h4><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></h4>
+                <p class="mb-1 text-muted">{{ job.company.employerprofile.company_name }}</p>
+                <span class="badge bg-secondary">{{ job.location }}</span>
+                <span class="badge bg-primary">{{ job.get_job_type_display }}</span>
+                {% if job.salary %}
+                <span class="badge bg-success">{{ job.salary }}</span>
+                {% endif %}
+                <p class="mt-2">{{ job.description|truncatewords:25 }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {% if jobs.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ jobs.previous_page_number }}">&laquo;</a>
+                    </li>
+                    {% endif %}
+                    {% for num in jobs.paginator.page_range %}
+                    <li class="page-item {% if jobs.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if jobs.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ jobs.next_page_number }}">&raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    {% else %}
+        <p>No jobs found.</p>
+    {% endif %}
+</div>
+{% endblock %}
