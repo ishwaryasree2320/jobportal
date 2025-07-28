@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: jobportal
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn jobportal.wsgi:application"
+    envVars:
+      - key: DEBUG
+        value: False
+      - key: SECRET_KEY
+        value:fa^j3m54pj+9hzltn4s-f8=vbp@i736r%qnjx^ovg7+^h!-bg!
+      - key: ALLOWED_HOSTS
+        value: '*'
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USE_TLS
+        value: True
+      - key: EMAIL_HOST_USER
+        value: hemalatha301027@gmail.com
+      - key: EMAIL_HOST_PASSWORD
+        value: zvke tarv ejis ilib
+      - key: DEFAULT_FROM_EMAIL
+        value: JobPortal <your_email@gmail.com>
