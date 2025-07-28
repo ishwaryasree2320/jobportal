@@ -134,3 +134,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # Allauth settings
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS = {'email'}
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'hemalatha301297@gmail.com'  # Replace with your Gmail address
+EMAIL_HOST_PASSWORD = 'zkve tarv eijs illb'  # Replace with your app password (NOT Gmail password)
+DEFAULT_FROM_EMAIL = 'JobPortal <your_email@gmail.com>'
