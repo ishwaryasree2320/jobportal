@@ -3,3 +3,4 @@ django-crispy-forms==2.1
 crispy-bootstrap5==2024.2
 django-allauth==0.61.1
 gunicorn
+python-decouple
