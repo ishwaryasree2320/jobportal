@@ -9,7 +9,9 @@ class JobCategory(models.Model):
     description = models.TextField(blank=True)
     
     def __str__(self):
-        return self.name
+        return self.name  # ✅ correct
+
+
 
 class Job(models.Model):
     JOB_TYPES = [
@@ -26,10 +28,9 @@ class Job(models.Model):
     job_type = models.CharField(max_length=20, choices=JOB_TYPES)
     category = models.ForeignKey(JobCategory, on_delete=models.SET_NULL, null=True)
     salary = models.CharField(max_length=100, blank=True)
-    company = models.ForeignKey(User, on_delete=models.CASCADE)
     posted_on = models.DateTimeField(default=timezone.now)
     deadline = models.DateField()
     is_active = models.BooleanField(default=True)
-    
+    posted_by = models.ForeignKey(User, on_delete=models.CASCADE,related_name='posted_jobs')
     def __str__(self):
-        return f"{self.title} at {self.company.employerprofile.company_name}"
+     return f"{self.title} at {self.posted_by.employerprofile.company_name}"

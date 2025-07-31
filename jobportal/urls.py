@@ -9,12 +9,8 @@ urlpatterns = [
     path('', include('jobs.urls')),
     path('users/', include('users.urls')),
     path('applications/', include('applications.urls')),
-    
     path('login/', CustomLoginView.as_view(), name='login'),
     path('logout/', CustomLogoutView.as_view(), name='logout'),
-
-    # ✅ Add this to support password reset and other account management features
-    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:

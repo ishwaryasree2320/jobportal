@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, EmployerProfileForm, JobSeekerProfileForm
-
+from applications.models import Application
+from jobs.models import Job
+from .models import EmployerProfile
 def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
@@ -55,13 +57,95 @@ class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('home')
 @login_required
 def profile(request):
-    if request.user.is_employer:
-        profile = request.user.employerprofile
+    user = request.user
+
+    if user.is_employer:
+        try:
+            profile = user.employerprofile
+        except:
+            return redirect('profile_complete')  # Ask them to fill profile if not exists
         template = 'users/employer_profile.html'
-    elif request.user.is_job_seeker:
-        profile = request.user.jobseekerprofile
+
+    elif user.is_job_seeker:
+        try:
+            profile = user.jobseekerprofile
+        except:
+            return redirect('profile_complete')
         template = 'users/jobseeker_profile.html'
+    
     else:
         return redirect('home')
-    
+
     return render(request, template, {'profile': profile})
+@login_required
+def edit_profile(request):
+    user = request.user
+
+    if user.is_employer:
+        profile = user.employerprofile
+        form_class = EmployerProfileForm
+    elif user.is_job_seeker:
+        profile = user.jobseekerprofile
+        form_class = JobSeekerProfileForm
+    else:
+        return redirect('home')
+
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('profile')
+    else:
+        form = form_class(instance=profile)
+
+    return render(request, 'users/edit_profile.html', {'form': form})
+from collections import defaultdict
+@login_required
+def employer_profile(request):
+    user = request.user
+    try:
+        profile = EmployerProfile.objects.get(user=user)
+    except EmployerProfile.DoesNotExist:
+        profile = None
+
+    jobs = Job.objects.filter(company=user)
+
+    jobs_with_applications = []
+
+    for job in jobs:
+        applications = Application.objects.filter(job=job).select_related('applicant')
+        jobs_with_applications.append({
+            'job': job,
+            'applications': applications
+        })
+
+    return render(request, 'users/employer_profile.html', {
+        'profile': profile,
+        'jobs_with_applications': jobs_with_applications
+    })
+
+
+@login_required
+def manage_posted_jobs(request):
+    user = request.user
+    if not user.is_employer:
+        return redirect('home')
+
+    try:
+        employer_profile = user.employerprofile
+    except EmployerProfile.DoesNotExist:
+        return redirect('profile_complete')
+
+    jobs = Job.objects.filter(company=user)
+    job_applications = {}
+
+    for job in jobs:
+        applications = Application.objects.filter(job=job).select_related('applicant')
+        job_applications[job] = applications
+
+    return render(request, 'jobs/manage_jobs.html', {
+        'jobs': jobs,
+        'job_applications': job_applications,
+    })
+

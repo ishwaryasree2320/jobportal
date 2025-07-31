@@ -1,18 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div class="container">
-    <h2>My Applications</h2>
-    <ul>
-      {% for application in applications %}
-        <li>
-          {{ application.job.title }} - Status: {{ application.status }}
-          <br>
-          <strong>Cover Letter:</strong> {{ application.cover_letter }}
-        </li>
-        <hr>
-      {% empty %}
-        <li>You have not applied to any jobs yet.</li>
-      {% endfor %}
-    </ul>
-  </div>
+<h2>My Applications</h2>
+<ul>
+    {% for application in applications %}
+    <li>
+        <strong>
+            <a href="{% url 'job_detail' application.job.id %}">
+                {{ application.job.title }}
+            </a>
+        </strong>
+        - Status: {{ application.status }}<br>
+        <strong>Cover Letter:</strong> {{ application.cover_letter }}<br>
+        <strong>Description:</strong> {{ application.job.description|truncatewords:30 }}
+    </li>
+    <hr>
+    {% empty %}
+    <p>No applications found.</p>
+    {% endfor %}
+</ul>
 {% endblock %}

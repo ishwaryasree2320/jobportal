@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
-
+{% load custom_filters %}
 {% block title %}Manage My Jobs{% endblock %}
+
 
 {% block content %}
 <div class="container my-5">
@@ -14,25 +15,86 @@
                     <th>Posted On</th>
                     <th>Status</th>
                     <th>Deadline</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for job in jobs %}
                 <tr>
                     <td><a href="{% url 'job_detail' job.id %}">{{ job.title }}</a></td>
-                    <td>{{ job.posted_on|date:"M d, Y" }}</td>
+                    <td>{{ job.created_at|date:"M d, Y" }}</td>
                     <td>
                         {% if job.is_active %}
-                        <span class="badge bg-success">Active</span>
+                            <span class="badge bg-success">Active</span>
                         {% else %}
-                        <span class="badge bg-danger">Closed</span>
+                            <span class="badge bg-danger">Closed</span>
                         {% endif %}
                     </td>
                     <td>{{ job.deadline|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="{% url 'edit_job' job.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'delete_job' job.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <h3 class="mt-5">Applicants for Your Jobs</h3>
+
+        {% for job in jobs %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <strong>{{ job.title }}</strong> – Posted on {{ job.created_at|date:"M d, Y" }}
+            </div>
+            <div class="card-body">
+               {% with applicants=job_applicants|get_item:job.id %}
+
+
+                    {% if applicants %}
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Applicant</th>
+                                    <th>Status</th>
+                                    <th>Resume</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for app in applicants %}
+                                <tr>
+                                    <td>{{ app.applicant.username }}</td>
+                                    <td>{{ app.status|capfirst }}</td>
+                                    <td>
+                                        {% if app.resume %}
+                                            <a href="{{ app.resume.url }}" target="_blank">View Resume</a>
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{% url 'update_application_status' app.id %}">
+                                            {% csrf_token %}
+                                            <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                <option value="">Update</option>
+                                                <option value="shortlisted">Shortlist</option>
+                                                <option value="hired">Hire</option>
+                                                <option value="rejected">Reject</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>No applicants yet.</p>
+                    {% endif %}
+                {% endwith %}
+            </div>
+        </div>
+        {% endfor %}
     {% else %}
         <p>You haven't posted any jobs yet.</p>
     {% endif %}

@@ -5,6 +5,8 @@
 <div class="container my-5">
     <h2>Welcome, {{ user.username }}</h2>
     <hr>
+    
+    <!-- Company Info -->
     <h4>Company Information</h4>
     <p><strong>Company Name:</strong> {{ profile.company_name }}</p>
     <p><strong>Description:</strong> {{ profile.company_description }}</p>
@@ -22,5 +24,43 @@
             No logo uploaded
         {% endif %}
     </p>
+    <a href="{% url 'edit_profile' %}" class="btn btn-primary mt-3">Edit Profile</a>
+<hr>
+    <!-- Jobs & Applications Section -->
+ <h2>Your Posted Jobs & Applicants</h2>
+
+{% if job_applications|length > 0 %}
+
+    {% for job, applications in job_applications.items %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+            <h3>{{ job.title }}</h3>
+            <p><strong>Location:</strong> {{ job.location }}</p>
+            <p><strong>Posted on:</strong> {{ job.posted_on }}</p>
+
+            {% if applications %}
+                <h4>Applicants:</h4>
+                <ul>
+                    {% for app in applications %}
+                        <li>
+                            <strong>{{ app.applicant.username }}</strong><br>
+                            <em>Status:</em> {{ app.status }}<br>
+                            <em>Cover Letter:</em> {{ app.cover_letter|default:"No letter provided" }}<br>
+                            {% if app.resume %}
+                               <a href="{{ app.resume.url }}" target="_blank">Download Resume</a>
+                            {% else %}
+                               No resume uploaded
+                           {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No applications yet.</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You have not posted any jobs yet.</p>
+{% endif %}
+
 </div>
 {% endblock %}

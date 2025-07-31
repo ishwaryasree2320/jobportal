@@ -1,23 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
-  <div class="container">
-    <h2>Applications for Your Jobs</h2>
-    <ul>
-      {% for application in applications %}
-        <li>
-          {{ application.applicant.username }} applied for {{ application.job.title }} - Status: {{ application.status }}
-          <br>
-          <strong>Cover Letter:</strong> {{ application.cover_letter }}
-          <br>
-          <a href="{% url 'update_application_status' application.id 'reviewed' %}">Mark as Reviewed</a> |
-          <a href="{% url 'update_application_status' application.id 'interview' %}">Interview</a> |
-          <a href="{% url 'update_application_status' application.id 'rejected' %}">Reject</a> |
-          <a href="{% url 'update_application_status' application.id 'hired' %}">Hire</a>
-        </li>
-        <hr>
-      {% empty %}
-        <li>No applications yet.</li>
-      {% endfor %}
-    </ul>
-  </div>
+<div class="container mt-5">
+  <h2 class="mb-4">Applications for Your Jobs</h2>
+
+{% if jobs_with_applications %}
+  {% for item in jobs_with_applications %}
+    {% with job=item.job applications=item.applications %}
+      <div class="list-group-item mb-4 border rounded shadow-sm p-3">
+        <h4>{{ job.title }} – Posted on {{ job.created_at|date:"d M Y" }}</h4>
+
+        {% if applications %}
+          <ul class="mt-2">
+            {% for application in applications %}
+              <li class="mb-2">
+                <strong>{{ application.applicant.username }}</strong><br>
+                <strong>Status:</strong> <span class="badge bg-info text-dark">{{ application.status|capfirst }}</span><br>
+                <strong>Cover Letter:</strong> {{ application.cover_letter }}<br>
+                <strong>Resume:</strong>
+                {% if application.resume %}
+                  <a href="{{ application.resume.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Download Resume</a>
+                {% else %}
+                  Not uploaded
+                {% endif %}
+                <div class="mt-2">
+                  <span class="me-2">Update Status:</span>
+                  <a href="{% url 'update_application_status' application.id 'reviewed' %}" class="btn btn-sm btn-secondary">Reviewed</a>
+                  <a href="{% url 'update_application_status' application.id 'interview' %}" class="btn btn-sm btn-warning">Interview</a>
+                  <a href="{% url 'update_application_status' application.id 'rejected' %}" class="btn btn-sm btn-danger">Reject</a>
+                  <a href="{% url 'update_application_status' application.id 'hired' %}" class="btn btn-sm btn-success">Hire</a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>No applicants yet.</p>
+        {% endif %}
+      </div>
+    {% endwith %}
+  {% endfor %}
+{% else %}
+  <p>You have not posted any jobs.</p>
+{% endif %}
+
+
+</div>
 {% endblock %}
